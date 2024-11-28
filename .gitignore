@@ -1,0 +1,46 @@
+# Archivos Python
+*.pyc
+*.pyo
+__pycache__/
+
+# Archivos de bases de datos locales
+db.sqlite3
+
+# Archivos de log
+*.log
+
+# Entornos virtuales
+venv/
+env/
+.venv/
+.virtualenv/
+
+# Archivos de dependencias
+*.egg-info/
+*.eggs/
+
+# Archivos generados por compilación
+build/
+dist/
+*.egg
+
+# Archivos de configuración del IDE
+.idea/
+.vscode/
+*.sublime-workspace
+
+# Archivos de configuración de sistema operativo
+.DS_Store   # macOS
+Thumbs.db   # Windows
+
+# Archivos sensibles
+.env
+*.env
+
+# Archivos temporales de editores de texto
+*.swp
+*.swo
+
+# Archivos de caché de Django
+*.pot
+*.py[cod]
