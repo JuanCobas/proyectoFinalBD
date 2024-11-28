@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Sitio{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <div>
+                <!-- Enlaces comunes -->
+                {% if user.is_authenticated %}
+                    <!-- Si el usuario está autenticado, muestra el botón de logout -->
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Logout</button>
+                    </form>
+                {% else %}
+                    <!-- Si no está autenticado, muestra los botones de login y registro -->
+                    <a href="{% url 'login' %}">
+                        <button>Iniciar sesión</button>
+                    </a>
+                    <a href="{% url 'register' %}">
+                        <button>Registrarse</button>
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <!-- El contenido de la página específica se insertará aquí -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+</body>
+</html>
