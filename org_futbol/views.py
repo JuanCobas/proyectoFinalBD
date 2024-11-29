@@ -377,7 +377,7 @@ class RepresentanteHomeView(View):
         # Obtener datos del representante
         with connection.cursor() as cursor:
             cursor.execute("""
-                SELECT u.username, u.email, o.id_representante
+                SELECT u.username, u.email, o.id_representante, o.nombre
                 FROM org_futbol_customuser u
                 INNER JOIN Representante o ON u.id = o.user_id
                 WHERE u.id = %s
@@ -390,6 +390,7 @@ class RepresentanteHomeView(View):
                 'username': representante_data[0],
                 'email': representante_data[1],
                 'id_representante': representante_data[2],
+                'nombre': representante_data[3],  # Agregar el nombre al contexto
             }
             id_representante = representante_data[2]
         else:
@@ -490,6 +491,24 @@ class RepresentanteHomeView(View):
                     WHERE Num_equipo = %s
                 """, [nombre_equipo, id_division, id_categoria, equipo_id])
 
+            return redirect('representante_home')
+         # Cambiar el nombre del representante
+        if 'cambiar_nombre' in request.POST:
+            nuevo_nombre = request.POST.get('nuevo_nombre')
+            
+            if not nuevo_nombre:
+                return render(request, 'representante_home.html', {
+                    'mensaje_error': 'El nombre no puede estar vacío.',
+                })
+            
+            with transaction.atomic(), connection.cursor() as cursor:
+                # Actualizar el nombre del representante
+                cursor.execute("""
+                    UPDATE Representante
+                    SET nombre = %s
+                    WHERE user_id = %s
+                """, [nuevo_nombre, request.user.id])
+            
             return redirect('representante_home')
 
         # Si no hay equipo, registrar uno nuevo
