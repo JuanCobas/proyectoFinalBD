@@ -1,8 +1,221 @@
 {% extends 'base.html' %}
 
-{% block title %}Bienvenido Director Técnico{% endblock %}
+{% block title %}Perfil del Director Técnico{% endblock %}
 
 {% block content %}
-    <h1>Bienvenido Director Técnico, {{ user.username }}</h1>
-    <!-- Contenido específico para el jugador -->
+<div class="profile-container">
+    <header>
+        <h1>Bienvenido Director Técnico, {{ request.user.username }}</h1>
+    </header>
+
+    {% if mensaje_error %}
+        <div class="error-message">{{ mensaje_error }}</div>
+    {% endif %}
+
+    <section class="personal-info">
+        <h2>Información Personal</h2>
+        <div class="info-item">
+            <strong>Nombre:</strong> <span>{{ tecnico.1 }}</span>
+        </div>
+        <div class="info-item">
+            <strong>Apellido:</strong> <span>{{ tecnico.2 }}</span>
+        </div>
+        <div class="info-item">
+            <strong>Teléfono:</strong> <span>{{ tecnico.3 }}</span>
+        </div>
+        <div class="info-item">
+            <strong>Correo Electrónico:</strong> <span>{{ tecnico.4 }}</span>
+        </div>
+    </section>
+
+    <section class="team-info">
+        <h3>Equipos a cargo</h3>
+        {% if equipos_tecnico %}
+            <table class="team-table">
+                <thead>
+                    <tr>
+                        <th>Número de Equipo</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>División</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for equipo in equipos_tecnico %}
+                        <tr>
+                            <td>{{ equipo.0 }}</td>
+                            <td>{{ equipo.1 }}</td>
+                            <td>{{ equipo.2 }}</td>
+                            <td>{{ equipo.3 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No hay equipos asignados actualmente.</p>
+        {% endif %}
+    </section>
+
+    <section class="update-info">
+        <h3>Actualizar Información</h3>
+        <form method="post" class="info-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nuevo_nombre"><strong>Nombre:</strong></label>
+                <input type="text" name="nuevo_nombre" id="nuevo_nombre" value="{{ tecnico.1 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nuevo_apellido"><strong>Apellido:</strong></label>
+                <input type="text" name="nuevo_apellido" id="nuevo_apellido" value="{{ tecnico.2 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nuevo_telefono"><strong>Teléfono:</strong></label>
+                <input type="text" name="nuevo_telefono" id="nuevo_telefono" value="{{ tecnico.3 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nuevo_email"><strong>Correo Electrónico:</strong></label>
+                <input type="email" name="nuevo_email" id="nuevo_email" value="{{ tecnico.4 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="equipo_seleccionado"><strong>Seleccionar Equipo:</strong></label>
+                <select name="equipo_seleccionado" id="equipo_seleccionado" required>
+                    <option value="">--Seleccione un equipo--</option>
+                    {% for equipo in equipos %}
+                        <option value="{{ equipo.0 }}">
+                            {{ equipo.1 }} - {{ equipo.2 }} - {{ equipo.3 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Guardar Cambios</button>
+        </form>
+    </section>
+</div>
+
+<style>
+    /* Estilos globales */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    .profile-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2.2em;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    h2, h3 {
+        color: #3498db;
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .info-item {
+        margin: 10px 0;
+        font-size: 1.1em;
+    }
+
+    .info-item span {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .team-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background-color: #f9f9f9;
+    }
+
+    .team-table th, .team-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .team-table th {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        background-color: #f9ebeb;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .info-form {
+        margin-top: 20px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1em;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        border-color: #3498db;
+        background-color: #fff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        outline: none;
+    }
+
+    button {
+        padding: 12px 20px;
+        font-size: 1.1em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+</style>
+
 {% endblock %}

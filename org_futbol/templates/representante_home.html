@@ -1,8 +1,258 @@
 {% extends 'base.html' %}
 
-{% block title %}Bienvenido Representante{% endblock %}
+{% block title %}Perfil del Director Técnico{% endblock %}
 
 {% block content %}
-    <h1>Bienvenido Representante, {{ user.username }}</h1>
-    <!-- Contenido específico para el jugador -->
+<div class="profile-container">
+    <header>
+        <h1>Bienvenido, {{ username }}</h1>
+        <p><strong>Correo Electrónico:</strong> {{ email }}</p>
+        <p><strong>ID del Representante:</strong> {{ id_representante }}</p>
+    </header>
+
+    {% if mensaje_error %}
+        <div class="error-message">{{ mensaje_error }}</div>
+    {% endif %}
+
+    <main>
+        <section class="team-info">
+            <h2>Datos del Equipo Registrado</h2>
+            {% if equipo %}
+                <form method="post" class="team-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Nombre del Equipo</label>
+                        <input type="text" name="nombre_equipo" value="{{ equipo.1 }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Seleccionar División</label>
+                        <select name="id_division" required>
+                            {% for division in divisiones %}
+                                <option value="{{ division.0 }}" {% if division.0 == equipo.4 %}selected{% endif %}>{{ division.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Seleccionar Categoría</label>
+                        <select name="id_categoria" required>
+                            {% for categoria in categorias %}
+                                <option value="{{ categoria.0 }}" {% if categoria.0 == equipo.5 %}selected{% endif %}>{{ categoria.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Guardar Cambios</button>
+                </form>
+
+                <section class="players">
+                    <h3>Jugadores del Equipo</h3>
+                    <table class="player-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Estado en el Equipo</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for jugador in jugadores %}
+                                <tr>
+                                    <td>{{ jugador.0 }}</td>
+                                    <td>{{ jugador.1 }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'representante_home' %}">
+                                            {% csrf_token %}
+                                            <select name="nuevo_estado">
+                                                <option value="Activo" {% if jugador.2 == 'Activo' %}selected{% endif %}>Activo</option>
+                                                <option value="Inactivo" {% if jugador.2 == 'Inactivo' %}selected{% endif %}>Inactivo</option>
+                                            </select>
+                                            <input type="hidden" name="num_jugador" value="{{ jugador.0 }}">
+                                            <button type="submit" name="cambiar_estado" class="btn-secondary">Actualizar Estado</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="4">No hay jugadores registrados en este equipo.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+
+
+            {% else %}
+                <p>Aún no has registrado un equipo.</p>
+
+                <section class="register-team">
+                    <h2>Registrar un Nuevo Equipo</h2>
+                    <form method="post" enctype="multipart/form-data" class="team-form">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label>Nombre del Equipo</label>
+                            <input type="text" name="nombre_equipo" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Seleccionar División</label>
+                            <select name="id_division" required>
+                                {% for division in divisiones %}
+                                    <option value="{{ division.0 }}">{{ division.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Seleccionar Categoría</label>
+                            <select name="id_categoria" required>
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.0 }}">{{ categoria.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn-primary">Registrar Equipo</button>
+                    </form>
+                </section>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 - Todos los derechos reservados.</p>
+    </footer>
+</div>
+
+<style>
+    /* Estilos globales */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        color: #333;
+    }
+
+    .profile-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2.2em;
+        color: #2c3e50;
+    }
+
+    h2, h3 {
+        color: #3498db;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        background-color: #f9ebeb;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1em;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        border-color: #3498db;
+        background-color: #fff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        outline: none;
+    }
+
+    button {
+        padding: 12px 20px;
+        font-size: 1em;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+    .btn-secondary {
+        background-color: #f39c12;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background-color: #e67e22;
+    }
+
+    .btn-danger {
+        background-color: #e74c3c;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background-color: #c0392b;
+    }
+
+    .player-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .player-table th, .player-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .player-table th {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .players {
+        margin-top: 20px;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 0.9em;
+        color: #7f8c8d;
+    }
+</style>
 {% endblock %}

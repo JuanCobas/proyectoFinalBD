@@ -1,8 +1,140 @@
 {% extends 'base.html' %}
 
-{% block title %}Bienvenido Jugador{% endblock %}
+{% block title %}Perfil del Jugador{% endblock %}
 
 {% block content %}
-    <h1>Bienvenido Jugador, {{ user.username }}</h1>
-    <!-- Contenido específico para el jugador -->
+<div class="container mt-4">
+    <div class="text-center">
+        <h1 class="mb-4">Bienvenido, {{ request.user.username }}</h1>
+    </div>
+
+    <!-- Mostrar mensajes de éxito o error -->
+    {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if foto_url %}
+    <div class="text-center mb-4">
+        <h2>Foto de Perfil Actual:</h2>
+        <img src="{{ foto_url }}" alt="Foto de perfil" class="rounded-circle img-thumbnail" style="width: 150px; height: 150px;">
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header text-white bg-primary">
+                    <h3 class="card-title">Información Personal</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Número de Socio:</strong> {{ jugador.0 }}</p>
+                    <p><strong>DNI:</strong> {{ jugador.1 }}</p>
+                    <p><strong>Nombre Completo:</strong> {{ jugador.2 }} {{ jugador.3 }}</p>
+                    <p><strong>Fecha de Nacimiento:</strong> {{ jugador.4 }}</p>
+                    <p><strong>Edad:</strong> {{ edad }} años</p>
+                    <p><strong>Categoría:</strong> {{ categoria }}</p>
+                    <p><strong>Teléfono:</strong> {{ jugador.5 }}</p>
+                    <p><strong>Dirección:</strong> {{ jugador.6 }}</p>
+                    <p><strong>Correo Electrónico:</strong> {{ jugador.8 }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header text-white bg-success">
+                    <h3 class="card-title">Información de Equipo</h3>
+                </div>
+                <div class="card-body">
+                    <p><strong>Equipo Actual:</strong> {{ equipo_actual.nombre }}</p>
+                    <p><strong>Número de Equipo:</strong> {{ equipo_actual.num_equipo }}</p>
+                    <p><strong>Categoría:</strong> {{ equipo_actual.categoria }}</p>
+                    <p><strong>División:</strong> {{ equipo_actual.division }}</p>
+                    <p><strong>¿Está en un equipo?</strong> 
+                        {% if esta_en_equipo %}
+                            Sí
+                        {% else %}
+                            No
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mt-4">
+        <div class="card-header text-white bg-info">
+            <h3 class="card-title text-center">Editar Información del Jugador</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <!-- Información personal -->
+                <h4 class="mb-3">Información Personal</h4>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nuevo_nombre" class="form-label">Nombre</label>
+                        <input type="text" name="nuevo_nombre" id="nuevo_nombre" value="{{ jugador.2 }}" class="form-control rounded-pill" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nuevo_apellido" class="form-label">Apellido</label>
+                        <input type="text" name="nuevo_apellido" id="nuevo_apellido" value="{{ jugador.3 }}" class="form-control rounded-pill" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nuevo_telefono" class="form-label">Teléfono</label>
+                        <input type="text" name="nuevo_telefono" id="nuevo_telefono" value="{{ jugador.5 }}" class="form-control rounded-pill" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nueva_direccion" class="form-label">Dirección</label>
+                        <input type="text" name="nueva_direccion" id="nueva_direccion" value="{{ jugador.6 }}" class="form-control rounded-pill" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nuevo_email" class="form-label">Correo Electrónico</label>
+                        <input type="email" name="nuevo_email" id="nuevo_email" value="{{ jugador.8 }}" class="form-control rounded-pill" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nueva_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
+                        <input type="date" name="nueva_fecha_nacimiento" id="nueva_fecha_nacimiento" value="{{ jugador.4 }}" class="form-control rounded-pill">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nuevo_dni" class="form-label">DNI</label>
+                        <input type="text" name="nuevo_dni" id="nuevo_dni" value="{{ jugador.1 }}" class="form-control rounded-pill" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="nueva_foto" class="form-label">Foto de Perfil</label>
+                        <input type="file" name="nueva_foto" id="nueva_foto" class="form-control rounded-pill">
+                    </div>
+                </div>
+    
+                <!-- Selección de equipo -->
+                <h4 class="mt-4 mb-3">Equipo</h4>
+                <div class="mb-3">
+                    <label for="equipo_seleccionado" class="form-label">Seleccionar Equipo</label>
+                    <select name="equipo_seleccionado" id="equipo_seleccionado" class="form-select rounded-pill">
+                        <option value="">--Seleccione un equipo--</option>
+                        {% for equipo in equipos %}
+                            <option value="{{ equipo.0 }}" {% if equipo_actual.nombre == equipo.1 %}selected{% endif %}>
+                                {{ equipo.1 }} - {{ equipo.2 }} - {{ equipo.3 }} ({{ equipo.4 }}-{{ equipo.5 }} años)
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+    
+                <!-- Botón de enviar -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg rounded-pill px-4 shadow">
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
 {% endblock %}

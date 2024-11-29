@@ -1,8 +1,235 @@
 {% extends 'base.html' %}
 
-{% block title %}Bienvenido Organizador{% endblock %}
+{% block title %}Perfil del Organizador{% endblock %}
 
 {% block content %}
-    <h1>Bienvenido Organizador, {{ user.username }}</h1>
-    <!-- Contenido específico para el jugador -->
+<div class="profile-container">
+    <header>
+        <h1>Bienvenido, {{ request.user.username }}</h1>
+    </header>
+
+    {% if mensaje_error %}
+        <div class="error-message">{{ mensaje_error }}</div>
+    {% endif %}
+
+    <!-- Perfil del Organizador -->
+    <section class="personal-info">
+        <h2>Perfil del Organizador</h2>
+        <form method="post" class="profile-form">
+            {% csrf_token %}
+            <input type="hidden" name="editar_perfil" value="1">
+
+            <div class="form-group">
+                <label for="nuevo_nombre">Nombre</label>
+                <input type="text" name="nuevo_nombre" id="nuevo_nombre" value="{{ organizador.0 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nuevo_apellido">Apellido</label>
+                <input type="text" name="nuevo_apellido" id="nuevo_apellido" value="{{ organizador.1 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nuevo_telefono">Teléfono</label>
+                <input type="text" name="nuevo_telefono" id="nuevo_telefono" value="{{ organizador.2 }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="nuevo_email">Correo Electrónico</label>
+                <input type="email" name="nuevo_email" id="nuevo_email" value="{{ organizador.3 }}" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Guardar Cambios</button>
+        </form>
+    </section>
+
+    <hr>
+
+    <!-- Torneos Creados -->
+    <section class="tournaments">
+        <h2>Torneos Creados</h2>
+        <table class="tournaments-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for torneo in torneos %}
+                    <tr>
+                        <td>{{ torneo.1 }}</td>
+                        <td>{{ torneo.2 }}</td>
+                        <td>{{ torneo.3 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <hr>
+
+    <!-- Crear Nuevo Torneo -->
+    <section class="create-tournament">
+        <h2>Crear Nuevo Torneo</h2>
+        <form method="post" class="create-tournament-form">
+            {% csrf_token %}
+            <input type="hidden" name="crear_torneo" value="1">
+
+            <div class="form-group">
+                <label for="nombre_torneo">Nombre</label>
+                <input type="text" name="nombre_torneo" id="nombre_torneo" required>
+            </div>
+
+            <div class="form-group">
+                <label for="periodo_inicio">Inicio</label>
+                <input type="date" name="periodo_inicio" id="periodo_inicio" required>
+            </div>
+
+            <div class="form-group">
+                <label for="periodo_fin">Fin</label>
+                <input type="date" name="periodo_fin" id="periodo_fin" required>
+            </div>
+
+            <div class="form-group">
+                <label for="id_categoria">Categoría</label>
+                <select name="id_categoria" id="id_categoria" required>
+                    {% for categoria in categorias %}
+                        <option value="{{ categoria.0 }}">{{ categoria.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="id_division">División</label>
+                <select name="id_division" id="id_division" required>
+                    {% for division in divisiones %}
+                        <option value="{{ division.0 }}">{{ division.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Crear Torneo</button>
+        </form>
+    </section>
+</div>
+
+<!-- Estilos CSS -->
+<style>
+    /* Estilo global */
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: #f7f9fc;
+        margin: 0;
+        padding: 0;
+        color: #444;
+    }
+
+    .profile-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2.5em;
+        color: #2c3e50;
+        margin-bottom: 20px;
+    }
+
+    .section {
+        margin-bottom: 30px;
+    }
+
+    .section h2 {
+        font-size: 1.8em;
+        color: #3498db;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 5px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        display: block;
+    }
+
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1.1em;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        background-color: #f9f9f9;
+        box-sizing: border-box;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+        border-color: #3498db;
+        background-color: #fff;
+        box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+        outline: none;
+    }
+
+    /* Botones */
+    .btn-primary {
+        background-color: #2ecc71;
+        color: white;
+        border: none;
+        padding: 15px;
+        width: 100%;
+        border-radius: 8px;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .btn-primary:hover {
+        background-color: #27ae60;
+    }
+
+    /* Tabla de torneos */
+    .tournaments-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    .tournaments-table th, .tournaments-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .tournaments-table th {
+        background-color: #3498db;
+        color: white;
+    }
+
+    .tournaments-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    /* Mensajes de error */
+    .error-message {
+        color: #e74c3c;
+        background-color: #f9ebeb;
+        border: 1px solid #e74c3c;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 1.1em;
+    }
+</style>
+
 {% endblock %}
+
